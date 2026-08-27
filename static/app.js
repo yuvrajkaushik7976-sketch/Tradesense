@@ -44,10 +44,16 @@ function pctBadge(pct) {
 // Fetchers
 // ---------------------------------------------------------------------------
 
-async function getJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`${url} -> ${res.status}`);
-  return res.json();
+async function getJSON(url, timeoutMs = 20000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`${url} -> ${res.status}`);
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function loadIndex() {
@@ -67,6 +73,10 @@ async function loadMovers() {
     renderMovers(data);
     return data;
   } catch (e) {
+    $("gainersList").innerHTML = `<div class="empty-state">Couldn't load</div>`;
+    $("losersList").innerHTML = `<div class="empty-state">Couldn't load</div>`;
+    $("ticker").classList.remove("is-loading");
+    $("tickerTrack").innerHTML = `<span class="ticker-item">Market data unavailable \u2014 tap refresh</span>`;
     return null;
   }
 }
@@ -186,7 +196,7 @@ function renderTicker(moversData) {
 
   if (!items.length) return;
   const html = items.map((i) => `<span class="ticker-item">${i}</span>`).join("");
-  track.innerHTML = html + html; // duplicated for a seamless scroll loop
+  track.innerHTML = html + html;
   $("ticker").classList.remove("is-loading");
 }
 
@@ -254,7 +264,6 @@ function ensureChart() {
   state.rsiSeries.createPriceLine({ price: 70, color: "#E8604C", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false });
   state.rsiSeries.createPriceLine({ price: 30, color: "#3ECF8E", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false });
 
-  // Keep the price chart and the RSI panel scrolling/zooming together.
   state.chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
     if (state._syncingRange || !range) return;
     state._syncingRange = true;
@@ -328,10 +337,14 @@ $("refreshBtn").addEventListener("click", async () => {
 });
 
 async function refreshAll() {
-  const idx = await loadIndex();
-  if (idx) window.__lastIndex = idx;
-  await loadMovers();
-  await loadWatchlist();
+  const [idx] = await Promise.all([
+    loadIndex().then((d) => {
+      if (d) window.__lastIndex = d;
+      return d;
+    }),
+    loadMovers(),
+    loadWatchlist(),
+  ]);
   if (state.symbol) loadHistory(state.symbol, state.range);
 }
 
