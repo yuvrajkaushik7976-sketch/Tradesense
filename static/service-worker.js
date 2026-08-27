@@ -1,5 +1,5 @@
 // @ts-nocheck
-const CACHE_NAME = "tradesense-v1";
+const CACHE_NAME = "tradesense-v2";
 const APP_SHELL = [
   "/",
   "/styles.css",
@@ -28,7 +28,6 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Never serve stale prices — API calls always go to the network.
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(
       fetch(event.request).catch(
@@ -42,8 +41,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache-first for the app shell so it still opens offline.
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    fetch(event.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return res;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
