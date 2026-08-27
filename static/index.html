@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0E1512" />
+<title>Tradesense</title>
+
+<link rel="manifest" href="/manifest.json" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+
+<div class="ticker is-loading" id="ticker">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item">Loading market data&hellip;</span>
+  </div>
+</div>
+
+<div class="app">
+
+  <div class="topbar">
+    <div class="wordmark">trade<span>sense</span></div>
+    <button class="refresh-btn" id="refreshBtn" aria-label="Refresh">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 4v6h-6M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="hero">
+    <div class="hero-label">Nifty 50</div>
+    <div class="hero-row">
+      <div>
+        <div class="hero-price" id="heroPrice">&mdash;</div>
+        <div class="hero-change" id="heroChange">&nbsp;</div>
+      </div>
+      <canvas class="hero-spark" id="heroSpark" width="110" height="44"></canvas>
+    </div>
+  </div>
+
+  <div class="chip-row" id="chipRow">
+    <div class="chip"><div class="chip-symbol">Loading&hellip;</div></div>
+  </div>
+
+  <div class="movers" id="movers">
+    <div class="movers-col">
+      <div class="movers-title">Top Gainers</div>
+      <div id="gainersList"></div>
+    </div>
+    <div class="movers-col">
+      <div class="movers-title">Top Losers</div>
+      <div id="losersList"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title" id="chartTitle">Select a stock</div>
+      <div class="indicator-toggles">
+        <button class="ind-toggle is-active" id="toggleMA">MA</button>
+        <button class="ind-toggle is-active" id="toggleRSI">RSI</button>
+      </div>
+    </div>
+    <div class="chart-legend">
+      <span><i class="legend-dot" style="background:#F0B429"></i>SMA 20</span>
+      <span><i class="legend-dot" style="background:#6C93C7"></i>SMA 50</span>
+      <span><i class="legend-dot" style="background:#9B8AC4"></i>RSI 14</span>
+    </div>
+    <div id="chart"></div>
+    <div id="rsiChart"></div>
+    <div class="range-pills" id="rangePills">
+      <button class="pill is-active" data-range="1D">1D</button>
+      <button class="pill" data-range="1W">1W</button>
+      <button class="pill" data-range="1M">1M</button>
+      <button class="pill" data-range="3M">3M</button>
+      <button class="pill" data-range="1Y">1Y</button>
+    </div>
+    <div class="stats" id="statsGrid">
+      <div><div class="stat-label">Open</div><div class="stat-value" id="statOpen">&mdash;</div></div>
+      <div><div class="stat-label">High</div><div class="stat-value" id="statHigh">&mdash;</div></div>
+      <div><div class="stat-label">Low</div><div class="stat-value" id="statLow">&mdash;</div></div>
+      <div><div class="stat-label">Volume</div><div class="stat-value" id="statVolume">&mdash;</div></div>
+    </div>
+  </div>
+
+  <div class="footer-note">Data via Yahoo Finance &middot; personal use only</div>
+
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
