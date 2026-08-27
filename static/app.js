@@ -105,7 +105,8 @@ async function loadHistory(symbol, range) {
     renderIndicators(data.indicators);
     if (data.candles.length) renderStats(data.candles[data.candles.length - 1]);
   } catch (e) {
-    $("chartTitle").textContent = "Couldn't load chart";
+    $("chartTitle").textContent = "Couldn't load chart (" + (e.message || e) + ")";
+  } finally {
   } finally {
     $("chart").style.opacity = "1";
   }
