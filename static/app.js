@@ -107,7 +107,6 @@ async function loadHistory(symbol, range) {
   } catch (e) {
     $("chartTitle").textContent = "Couldn't load chart (" + (e.message || e) + ")";
   } finally {
-  } finally {
     $("chart").style.opacity = "1";
   }
 }
@@ -197,7 +196,7 @@ function renderTicker(moversData) {
 
   if (!items.length) return;
   const html = items.map((i) => `<span class="ticker-item">${i}</span>`).join("");
-  track.innerHTML = html + html;
+  track.innerHTML = html + html; // duplicated for a seamless scroll loop
   $("ticker").classList.remove("is-loading");
 }
 
@@ -265,6 +264,7 @@ function ensureChart() {
   state.rsiSeries.createPriceLine({ price: 70, color: "#E8604C", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false });
   state.rsiSeries.createPriceLine({ price: 30, color: "#3ECF8E", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false });
 
+  // Keep the price chart and the RSI panel scrolling/zooming together.
   state.chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
     if (state._syncingRange || !range) return;
     state._syncingRange = true;
@@ -338,6 +338,8 @@ $("refreshBtn").addEventListener("click", async () => {
 });
 
 async function refreshAll() {
+  // Run these at the same time — the index card shouldn't wait behind the
+  // heavier 50-stock movers fetch, and vice versa.
   const [idx] = await Promise.all([
     loadIndex().then((d) => {
       if (d) window.__lastIndex = d;

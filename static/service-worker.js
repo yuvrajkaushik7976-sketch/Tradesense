@@ -28,6 +28,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
+  // Never serve stale prices — API calls always go to the network.
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(
       fetch(event.request).catch(
@@ -41,6 +42,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Network-first for the app shell, so updates show up immediately next
+  // time you open the app. Only falls back to the saved copy if you're
+  // genuinely offline.
   event.respondWith(
     fetch(event.request)
       .then((res) => {
