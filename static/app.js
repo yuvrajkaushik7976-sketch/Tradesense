@@ -360,6 +360,3 @@ if ("serviceWorker" in navigator) {
 }
 
 refreshAll();
-setInterval(() => {
-  if (document.visibilityState === "visible") refreshAll();
-}, 60000);
